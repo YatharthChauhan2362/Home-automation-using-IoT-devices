@@ -1,3 +1,5 @@
+// Uncomment the following line to enable serial debug output
+//#define ENABLE_DEBUG
 
 #ifdef ENABLE_DEBUG
        #define DEBUG_ESP_PORT Serial
@@ -12,16 +14,16 @@
 
 #include <map>
 
-#define WIFI_SSID         "YOUR-WIFI-NAME"    
-#define WIFI_PASS         "YOUR-WIFI-PASSWORD"
-#define APP_KEY           "YOUR-APP-KEY"      // Should look like "de0bxxxx-1x3x-4x3x-ax2x-5dabxxxxxxxx"
-#define APP_SECRET        "YOUR-APP-SECRET"   // Should look like "5f36xxxx-x3x7-4x3x-xexe-e86724a9xxxx-4c4axxxx-3x3x-x5xe-x9x3-333d65xxxxxx"
+#define WIFI_SSID         "OnePlus 8"    
+#define WIFI_PASS         "YugDave020"
+#define APP_KEY           "837b0995-7b9b-4ae8-ac1e-fd3e55e1b632"      // Should look like "de0bxxxx-1x3x-4x3x-ax2x-5dabxxxxxxxx"
+#define APP_SECRET        "123e2025-cdb3-4138-a798-4e623dd5a6d8-60e695e7-a617-44c5-8345-dde9f4da7463"   // Should look like "5f36xxxx-x3x7-4x3x-xexe-e86724a9xxxx-4c4axxxx-3x3x-x5xe-x9x3-333d65xxxxxx"
 
 //Enter the device IDs here
 #define device_ID_1   "xxxxxxxxxxxxxxxxxxxxxxxx"
-#define device_ID_2   "60764ab82fb4f14a3bedebfc"
-#define device_ID_3   "60764ac948ccc14a4674c049"
-#define device_ID_4   "60764aa148ccc14a4674c047"
+#define device_ID_2   "64f2b53b6fa3acf7e1108c8a"
+#define device_ID_3   "64f2b57f6fa3acf7e1108ceb"
+#define device_ID_4   "64f2b5c76fa3acf7e1108d1f"
 
 // define the GPIO connected with Relays and switches
 #define RelayPin1 5  //D1
@@ -36,6 +38,9 @@
 
 #define wifiLed   16   //D0
 
+// comment the following line if you use a toggle switches instead of tactile buttons
+#define TACTILE_BUTTON 1
+
 #define BAUD_RATE   9600
 
 #define DEBOUNCE_TIME 250
@@ -46,7 +51,10 @@ typedef struct {      // struct for the std::map below
 } deviceConfig_t;
 
 
-
+// this is the main configuration
+// please put in your deviceId, the PIN for Relay and PIN for flipSwitch
+// this can be up to N devices...depending on how much pin's available on your device ;)
+// right now we have 4 devicesIds going to 4 relays and 4 flip switches to switch the relay manually
 std::map<String, deviceConfig_t> devices = {
     //{deviceId, {relayPIN,  flipSwitchPIN}}
     {device_ID_1, {  RelayPin1, SwitchPin1 }},
@@ -61,7 +69,8 @@ typedef struct {      // struct for the std::map below
   unsigned long lastFlipSwitchChange;
 } flipSwitchConfig_t;
 
-std::map<int, flipSwitchConfig_t> flipSwitches;    // this map is used to map 
+std::map<int, flipSwitchConfig_t> flipSwitches;    // this map is used to map flipSwitch PINs to deviceId and handling debounce and last flipSwitch state checks
+                                                  // it will be setup in "setupFlipSwitches" function, using informations from devices map
 
 void setupRelays() { 
   for (auto &device : devices) {           // for each device (relay, flipSwitch combination)
